@@ -10,8 +10,7 @@ const indonesianSatellites = [
   { name: "SATRIA-1", type: "Internet/VSAT", operator: "BAKTI", orbit: "GEO 146°E", status: "ACTIVE", year: 2023 },
   { name: "LAPAN-A2/ORARI", type: "Observasi Bumi", operator: "LAPAN/BRIN", orbit: "LEO 650km", status: "ACTIVE", year: 2015 },
   { name: "LAPAN-A3/IPB", type: "Observasi Bumi", operator: "LAPAN/BRIN", orbit: "LEO 505km", status: "ACTIVE", year: 2016 },
-  { name: "LAPAN-A4 (LAPAN-Tubsat)", type: "Observasi/Surveillance", operator: "LAPAN/BRIN", orbit: "LEO", status: "ACTIVE", year: 2007 },
-  // Military/Classified
+  { name: "LAPAN-A4 (LAPAN-Tubsat)", type: "Observasi", operator: "LAPAN/BRIN", orbit: "LEO", status: "ACTIVE", year: 2007 },
   { name: "CHINASAT-11 (Lease)", type: "Militer/Komunikasi", operator: "TNI", orbit: "GEO", status: "CLASSIFIED", year: 2013 },
   { name: "NUSANTARA-SAT", type: "Intelijen/Pertahanan", operator: "BIN/TNI", orbit: "LEO", status: "CLASSIFIED", year: 2024 },
   { name: "SAT-PERTAHANAN-1", type: "Militer ISR", operator: "Kemenhan", orbit: "LEO", status: "CLASSIFIED", year: 2025 },
@@ -22,44 +21,42 @@ const indonesianSatellites = [
 const SatelliteView = () => {
   return (
     <div className="h-full p-3 overflow-y-auto">
-      <div className="mb-4 flex items-center gap-3">
-        <Satellite className="w-5 h-5 text-primary" />
+      <div className="mb-3 flex items-center gap-2.5">
+        <Satellite className="w-4 h-4 text-muted-foreground" />
         <div>
-          <h2 className="text-sm font-bold text-foreground">Satelit Indonesia</h2>
-          <p className="text-[10px] font-mono text-muted-foreground">
-            Complete Indonesian Satellite Registry — {indonesianSatellites.length} satellites tracked
+          <h2 className="text-xs font-bold text-foreground tracking-wide">SATELIT INDONESIA</h2>
+          <p className="text-[9px] font-mono text-muted-foreground">
+            {indonesianSatellites.length} satellites tracked
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 gap-1.5">
         {indonesianSatellites.map((sat) => (
-          <DashboardPanel key={sat.name} title={sat.name} icon={<Satellite className="w-3 h-3" />}>
-            <div className="grid grid-cols-5 gap-4 text-[10px] font-mono">
-              <div>
-                <span className="text-muted-foreground block">TYPE</span>
-                <span className="text-foreground">{sat.type}</span>
+          <div key={sat.name} className="bg-card border border-border rounded p-2.5">
+            <div className="grid grid-cols-6 gap-3 text-[9px] font-mono items-center">
+              <div className="col-span-1">
+                <span className="text-foreground font-medium">{sat.name}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block">OPERATOR</span>
-                <span className="text-foreground">{sat.operator}</span>
+                <span className="text-muted-foreground">{sat.type}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block">ORBIT</span>
-                <span className="text-foreground">{sat.orbit}</span>
+                <span className="text-muted-foreground">{sat.operator}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block">YEAR</span>
-                <span className="text-foreground">{sat.year}</span>
+                <span className="text-muted-foreground">{sat.orbit}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block">STATUS</span>
-                <span className={sat.status === "CLASSIFIED" ? "text-accent" : "status-online"}>
+                <span className="text-muted-foreground">{sat.year}</span>
+              </div>
+              <div className="text-right">
+                <span className={sat.status === "CLASSIFIED" ? "status-active" : "text-foreground"}>
                   {sat.status}
                 </span>
               </div>
             </div>
-          </DashboardPanel>
+          </div>
         ))}
       </div>
     </div>
