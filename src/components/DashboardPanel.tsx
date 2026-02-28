@@ -11,17 +11,16 @@ interface DashboardPanelProps {
 const DashboardPanel = ({ title, children, className = "", icon }: DashboardPanelProps) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className={`bg-card border border-border rounded-lg overflow-hidden ${className}`}
+      transition={{ duration: 0.3 }}
+      className={`bg-card border border-border rounded overflow-hidden ${className}`}
     >
-      <div className="px-3 py-2 border-b border-border flex items-center gap-2">
-        {icon && <span className="text-primary">{icon}</span>}
-        <h3 className="text-[10px] font-mono tracking-wider text-muted-foreground uppercase">{title}</h3>
-        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
+      <div className="px-2.5 py-1.5 border-b border-border flex items-center gap-1.5">
+        {icon && <span className="text-muted-foreground">{icon}</span>}
+        <h3 className="text-[9px] font-mono tracking-wider text-muted-foreground uppercase">{title}</h3>
       </div>
-      <div className="p-3">{children}</div>
+      <div className="p-2.5">{children}</div>
     </motion.div>
   );
 };

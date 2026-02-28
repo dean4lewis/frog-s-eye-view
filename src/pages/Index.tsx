@@ -61,9 +61,7 @@ const Index = () => {
 
   return (
     <>
-      <AnimatePresence>
-        {booting && <ScanEffect onComplete={() => setBooting(false)} />}
-      </AnimatePresence>
+      {booting && <ScanEffect onComplete={() => setBooting(false)} />}
 
       {!booting && (
         <div className="h-screen flex overflow-hidden hex-pattern">

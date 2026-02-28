@@ -67,31 +67,31 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   };
 
   return (
-    <div className="w-64 h-screen bg-sidebar border-r border-border flex flex-col overflow-hidden">
+    <div className="w-60 h-screen bg-sidebar border-r border-border flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center">
-            <Shield className="w-4 h-4 text-primary" />
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded bg-secondary flex items-center justify-center">
+            <Shield className="w-3.5 h-3.5 text-primary" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-foreground tracking-wider">INTL-SRVID</h1>
-            <p className="text-[10px] text-muted-foreground font-mono">SURVEILLANCE SYSTEM v2.1</p>
+            <h1 className="text-xs font-bold text-foreground tracking-[0.15em]">INTL-SRVID</h1>
+            <p className="text-[9px] font-mono text-muted-foreground">SURVEILLANCE v2.1</p>
           </div>
         </div>
         <div className="mt-3 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-primary pulse-dot" />
-          <span className="text-[10px] font-mono text-primary">SYSTEM ONLINE</span>
+          <div className="w-1.5 h-1.5 rounded-full bg-primary pulse-dot" />
+          <span className="text-[9px] font-mono text-muted-foreground">SYSTEM ONLINE</span>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto py-2 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto py-1">
         {menuGroups.map((group) => (
-          <div key={group.label} className="mb-1">
+          <div key={group.label} className="mb-0.5">
             <button
               onClick={() => toggleGroup(group.label)}
-              className="w-full px-4 py-2 flex items-center justify-between text-[10px] font-mono tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+              className="w-full px-4 py-1.5 flex items-center justify-between text-[9px] font-mono tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors"
             >
               {group.label}
               <ChevronDown
@@ -106,7 +106,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: 0.15 }}
                   className="overflow-hidden"
                 >
                   {group.items.map((item) => {
@@ -116,10 +116,10 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
                       <button
                         key={item.id}
                         onClick={() => onSectionChange(item.id)}
-                        className={`w-full px-4 py-2 flex items-center gap-3 text-xs transition-all ${
+                        className={`w-full px-4 py-1.5 flex items-center gap-2.5 text-[11px] transition-all ${
                           isActive
-                            ? "bg-primary/10 text-primary border-r-2 border-primary"
-                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                            ? "bg-secondary text-foreground border-r-2 border-primary"
+                            : "text-muted-foreground hover:text-secondary-foreground hover:bg-muted"
                         }`}
                       >
                         <Icon className="w-3.5 h-3.5" />
@@ -135,19 +135,19 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border">
-        <div className="text-[9px] font-mono text-muted-foreground space-y-1">
+      <div className="p-3 border-t border-border">
+        <div className="text-[8px] font-mono text-muted-foreground space-y-1">
           <div className="flex justify-between">
             <span>UPTIME</span>
-            <span className="status-online">99.97%</span>
+            <span className="text-foreground">99.97%</span>
           </div>
           <div className="flex justify-between">
             <span>ENCRYPTION</span>
-            <span className="status-online">AES-256</span>
+            <span className="text-foreground">AES-256</span>
           </div>
           <div className="flex justify-between">
             <span>CLEARANCE</span>
-            <span className="status-warning">LEVEL 5</span>
+            <span className="text-primary">LEVEL 5</span>
           </div>
         </div>
       </div>
