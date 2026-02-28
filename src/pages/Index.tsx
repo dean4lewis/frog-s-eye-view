@@ -9,6 +9,7 @@ import TargetView from "@/components/TargetView";
 import TerminalOverlay from "@/components/TerminalOverlay";
 import ScanEffect from "@/components/ScanEffect";
 import GlobeScene from "@/components/GlobeScene";
+import MilitaryMapView from "@/components/MilitaryMapView";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -35,6 +36,8 @@ const Index = () => {
         return <SatelliteView />;
       case "cctv":
         return <CCTVView />;
+      case "mapping":
+        return <MilitaryMapView />;
       case "targets":
         return <TargetView />;
       case "terminal":

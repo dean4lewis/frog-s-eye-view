@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { ReactNode, forwardRef } from "react";
 
 interface DashboardPanelProps {
   title: string;
@@ -8,9 +8,10 @@ interface DashboardPanelProps {
   icon?: ReactNode;
 }
 
-const DashboardPanel = ({ title, children, className = "", icon }: DashboardPanelProps) => {
+const DashboardPanel = forwardRef<HTMLDivElement, DashboardPanelProps>(({ title, children, className = "", icon }, ref) => {
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -23,6 +24,8 @@ const DashboardPanel = ({ title, children, className = "", icon }: DashboardPane
       <div className="p-2.5">{children}</div>
     </motion.div>
   );
-};
+});
+
+DashboardPanel.displayName = "DashboardPanel";
 
 export default DashboardPanel;
