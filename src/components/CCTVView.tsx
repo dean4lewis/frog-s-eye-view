@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { MapPin, Monitor, ExternalLink, Wifi, WifiOff, ChevronDown } from "lucide-react";
+import { MapPin, Monitor, ExternalLink, Wifi, ChevronDown, Play, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CCTVRuas {
   id: string;
@@ -41,8 +42,9 @@ const totalOnline = cctvTollRoads.reduce((sum, r) => sum + r.online, 0);
 const CCTVView = () => {
   const [selectedRuas, setSelectedRuas] = useState(cctvTollRoads[0]);
   const [expandedRegion, setExpandedRegion] = useState<string | null>(null);
+  const [showLiveEmbed, setShowLiveEmbed] = useState(false);
+  const [viewMode, setViewMode] = useState<"map" | "live">("map");
 
-  // Group by region
   const regions = Array.from(new Set(cctvTollRoads.map(r => r.region)));
 
   return (
@@ -58,74 +60,117 @@ const CCTVView = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 text-[8px] font-mono">
+        <div className="flex items-center gap-2 text-[8px] font-mono">
+          <button
+            onClick={() => setViewMode("map")}
+            className={`px-2 py-0.5 rounded border transition-colors ${viewMode === "map" ? "border-primary bg-secondary text-foreground" : "border-border bg-card text-muted-foreground"}`}
+          >
+            Map View
+          </button>
+          <button
+            onClick={() => setViewMode("live")}
+            className={`px-2 py-0.5 rounded border transition-colors ${viewMode === "live" ? "border-primary bg-secondary text-foreground" : "border-border bg-card text-muted-foreground"}`}
+          >
+            Live CCTV
+          </button>
           <span className="flex items-center gap-1 text-primary"><Wifi className="w-3 h-3" /> LIVE</span>
           <a href="https://bpjt.pu.go.id/cctv/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
             <ExternalLink className="w-3 h-3" /> BPJT
-          </a>
-          <a href="https://mudik.pu.go.id/cctv-tol" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
-            <ExternalLink className="w-3 h-3" /> Mudik
           </a>
         </div>
       </div>
 
       <div className="flex-1 grid grid-cols-4 gap-2 min-h-0">
-        {/* Map View - Dark Military Style */}
+        {/* Main Content */}
         <div className="col-span-3 bg-card border border-border rounded overflow-hidden relative flex flex-col">
-          {/* Browser bar */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-secondary border-b border-border shrink-0">
-            <div className="flex gap-1">
-              <div className="w-2 h-2 rounded-full bg-destructive" />
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(35, 80%, 50%)" }} />
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(120, 30%, 35%)" }} />
-            </div>
-            <div className="flex-1 bg-muted rounded px-3 py-0.5 text-[9px] font-mono text-muted-foreground text-center truncate">
-              intl-srvid.mil.id/cctv/{selectedRuas.id} — {selectedRuas.name}
-            </div>
-          </div>
-
-          {/* Dark military map with marker */}
-          <div className="relative flex-1">
-            <iframe
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=${selectedRuas.lon - 0.08}%2C${selectedRuas.lat - 0.05}%2C${selectedRuas.lon + 0.08}%2C${selectedRuas.lat + 0.05}&layer=mapnik&marker=${selectedRuas.lat}%2C${selectedRuas.lon}`}
-              className="w-full h-full border-0"
-              style={{ minHeight: "300px", filter: "grayscale(100%) brightness(0.25) contrast(1.6) sepia(0.15) hue-rotate(180deg)" }}
-              title="CCTV Surveillance Map"
-            />
-
-            {/* Overlay HUD */}
-            <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
-              <div className="text-[9px] font-mono text-foreground font-medium">{selectedRuas.name}</div>
-              <div className="text-[8px] font-mono text-muted-foreground">{selectedRuas.region} · BUJT ({selectedRuas.operator})</div>
-              <div className="text-[8px] font-mono text-muted-foreground mt-0.5">
-                {selectedRuas.lat.toFixed(4)}°S, {selectedRuas.lon.toFixed(4)}°E
+          {viewMode === "map" ? (
+            <>
+              {/* Browser bar */}
+              <div className="flex items-center gap-2 px-3 py-1 bg-secondary border-b border-border shrink-0">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 rounded-full bg-destructive" />
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(35, 80%, 50%)" }} />
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(120, 30%, 35%)" }} />
+                </div>
+                <div className="flex-1 bg-muted rounded px-3 py-0.5 text-[9px] font-mono text-muted-foreground text-center truncate">
+                  intl-srvid.mil.id/cctv/{selectedRuas.id} — {selectedRuas.name}
+                </div>
               </div>
-            </div>
 
-            <div className="absolute top-2 right-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
-              <div className="text-[8px] font-mono text-primary">{selectedRuas.online} CAM ONLINE</div>
-              <div className="text-[7px] font-mono text-muted-foreground">LIVE FEED ACTIVE</div>
-            </div>
+              <div className="relative flex-1">
+                <iframe
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${selectedRuas.lon - 0.08}%2C${selectedRuas.lat - 0.05}%2C${selectedRuas.lon + 0.08}%2C${selectedRuas.lat + 0.05}&layer=mapnik&marker=${selectedRuas.lat}%2C${selectedRuas.lon}`}
+                  className="w-full h-full border-0"
+                  style={{ minHeight: "300px", filter: "grayscale(100%) brightness(0.25) contrast(1.6) sepia(0.15) hue-rotate(180deg)" }}
+                  title="CCTV Surveillance Map"
+                />
 
-            <div className="absolute bottom-2 right-2 flex gap-1.5">
-              <a
-                href={selectedRuas.embedUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-card/90 border border-border rounded px-2 py-1 text-[8px] font-mono text-primary hover:bg-secondary transition-colors flex items-center gap-1"
-              >
-                <ExternalLink className="w-2.5 h-2.5" /> Buka CCTV Live
-              </a>
-              <a
-                href={`https://bpjt.pu.go.id/cctv/`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-card/90 border border-border rounded px-2 py-1 text-[8px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-              >
-                <ExternalLink className="w-2.5 h-2.5" /> BPJT Portal
-              </a>
-            </div>
-          </div>
+                <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
+                  <div className="text-[9px] font-mono text-foreground font-medium">{selectedRuas.name}</div>
+                  <div className="text-[8px] font-mono text-muted-foreground">{selectedRuas.region} · BUJT ({selectedRuas.operator})</div>
+                  <div className="text-[8px] font-mono text-muted-foreground mt-0.5">
+                    {selectedRuas.lat.toFixed(4)}°S, {selectedRuas.lon.toFixed(4)}°E
+                  </div>
+                </div>
+
+                <div className="absolute top-2 right-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
+                  <div className="text-[8px] font-mono text-primary">{selectedRuas.online} CAM ONLINE</div>
+                </div>
+
+                <div className="absolute bottom-2 left-2 right-2 flex gap-1.5">
+                  <button
+                    onClick={() => setViewMode("live")}
+                    className="bg-card/90 border border-primary rounded px-2.5 py-1 text-[8px] font-mono text-primary hover:bg-secondary transition-colors flex items-center gap-1"
+                  >
+                    <Play className="w-2.5 h-2.5" /> Play Live CCTV
+                  </button>
+                  <a
+                    href={selectedRuas.embedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-card/90 border border-border rounded px-2 py-1 text-[8px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-2.5 h-2.5" /> Buka di Tab Baru
+                  </a>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Live CCTV Embed */}
+              <div className="flex items-center gap-2 px-3 py-1 bg-secondary border-b border-border shrink-0">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 rounded-full bg-destructive" />
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(35, 80%, 50%)" }} />
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "hsl(120, 30%, 35%)" }} />
+                </div>
+                <div className="flex-1 bg-muted rounded px-3 py-0.5 text-[9px] font-mono text-muted-foreground text-center truncate">
+                  mudik.pu.go.id/cctv-tol — {selectedRuas.name} — LIVE FEED
+                </div>
+                <button onClick={() => setViewMode("map")} className="text-muted-foreground hover:text-foreground">
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+
+              <div className="flex-1 relative">
+                <iframe
+                  src={selectedRuas.embedUrl}
+                  className="w-full h-full border-0"
+                  style={{ minHeight: "400px" }}
+                  title={`CCTV Live - ${selectedRuas.name}`}
+                  allow="fullscreen"
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                />
+                <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+                    <span className="text-[9px] font-mono text-foreground">LIVE — {selectedRuas.name}</span>
+                  </div>
+                  <div className="text-[8px] font-mono text-muted-foreground">{selectedRuas.online} cameras · {selectedRuas.region}</div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* CCTV List */}
@@ -148,7 +193,9 @@ const CCTVView = () => {
                 {isExpanded && ruasInRegion.map((ruas) => (
                   <button
                     key={ruas.id}
-                    onClick={() => setSelectedRuas(ruas)}
+                    onClick={() => {
+                      setSelectedRuas(ruas);
+                    }}
                     className={`w-full text-left p-2 rounded border transition-all mt-0.5 ${
                       selectedRuas.id === ruas.id
                         ? "border-primary bg-secondary"
@@ -167,7 +214,16 @@ const CCTVView = () => {
                       <span className="text-[7px] font-mono text-primary flex items-center gap-0.5">
                         <Wifi className="w-2 h-2" /> {ruas.online} online
                       </span>
-                      <span className="text-[6px] font-mono text-muted-foreground">{ruas.operator}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedRuas(ruas);
+                          setViewMode("live");
+                        }}
+                        className="text-[7px] font-mono text-primary hover:text-foreground flex items-center gap-0.5"
+                      >
+                        <Play className="w-2 h-2" /> View
+                      </button>
                     </div>
                   </button>
                 ))}
