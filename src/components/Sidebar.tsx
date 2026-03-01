@@ -44,6 +44,7 @@ const menuGroups = [
       { id: "cctv", icon: Monitor, label: "CCTV Network" },
       { id: "digital", icon: Cpu, label: "Digital Monitor" },
       { id: "mapping", icon: Map, label: "Mapping Wilayah" },
+      { id: "mapmodes", icon: Globe, label: "Intelligence Maps" },
     ],
   },
   {

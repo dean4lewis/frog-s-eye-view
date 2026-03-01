@@ -10,17 +10,41 @@ import TerminalOverlay from "@/components/TerminalOverlay";
 import ScanEffect from "@/components/ScanEffect";
 import GlobeScene from "@/components/GlobeScene";
 import MilitaryMapView from "@/components/MilitaryMapView";
+import LoginScreen from "@/components/LoginScreen";
+import SubmarineView from "@/components/SubmarineView";
+import CommsView from "@/components/CommsView";
+import MonitoringView from "@/components/MonitoringView";
+import RadarView from "@/components/RadarView";
+import DroneAircraftView from "@/components/DroneAircraftView";
+import AgentView from "@/components/AgentView";
+import AnalysisView from "@/components/AnalysisView";
+import OperationsView from "@/components/OperationsView";
+import DigitalMonitorView from "@/components/DigitalMonitorView";
+import ReportsView from "@/components/ReportsView";
+import DatabaseView from "@/components/DatabaseView";
+import MapModesView from "@/components/MapModesView";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [booting, setBooting] = useState(true);
   const [terminalMessage, setTerminalMessage] = useState<string | undefined>();
+  const [authenticated, setAuthenticated] = useState(false);
+  const [userCodename, setUserCodename] = useState("");
 
   const openTerminal = (msg?: string) => {
     setTerminalMessage(msg);
     setTerminalOpen(true);
   };
+
+  const handleLogin = (codename: string) => {
+    setUserCodename(codename);
+    setAuthenticated(true);
+  };
+
+  if (!authenticated) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
 
   const renderContent = () => {
     switch (activeSection) {
@@ -40,6 +64,30 @@ const Index = () => {
         return <MilitaryMapView />;
       case "targets":
         return <TargetView />;
+      case "submarines":
+        return <SubmarineView />;
+      case "comms":
+        return <CommsView />;
+      case "monitoring":
+        return <MonitoringView />;
+      case "radar":
+        return <RadarView />;
+      case "drones":
+        return <DroneAircraftView />;
+      case "agents":
+        return <AgentView />;
+      case "analysis":
+        return <AnalysisView />;
+      case "operations":
+        return <OperationsView />;
+      case "digital":
+        return <DigitalMonitorView />;
+      case "reports":
+        return <ReportsView />;
+      case "database":
+        return <DatabaseView />;
+      case "mapmodes":
+        return <MapModesView />;
       case "terminal":
         openTerminal();
         setActiveSection("dashboard");
@@ -55,7 +103,6 @@ const Index = () => {
               <p className="text-[10px] font-mono text-muted-foreground">
                 Module sedang dalam pengembangan
               </p>
-              <p className="text-[9px] font-mono text-primary mt-2">CLEARANCE REQUIRED</p>
             </div>
           </div>
         );
