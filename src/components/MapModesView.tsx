@@ -1,76 +1,60 @@
 import { useState } from "react";
-import { Map, Layers, Globe, ExternalLink, Navigation } from "lucide-react";
+import { Map, Layers, Globe, Navigation } from "lucide-react";
 
 const basemaps = [
   {
     id: "dark-gray",
     label: "Dark Gray Canvas",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-    embedUrl: "https://www.arcgis.com/apps/mapviewer/index.html?webmap=&basemapUrl=https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer",
-    iframeSrc: "https://www.openstreetmap.org/export/embed.html?bbox=93%2C-12%2C141%2C8&layer=mapnik",
+    bbox: "93%2C-12%2C141%2C8",
     filter: "grayscale(100%) brightness(0.2) contrast(1.8) sepia(0.1) hue-rotate(180deg)",
     description: "Dark Gray Military Intelligence",
   },
   {
-    id: "satellite",
-    label: "Satellite Imagery",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
-    embedUrl: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
-    iframeSrc: "https://www.openstreetmap.org/export/embed.html?bbox=93%2C-12%2C141%2C8&layer=mapnik",
-    filter: "brightness(0.7) contrast(1.3) saturate(0.8)",
-    description: "Esri World Satellite Imagery",
-  },
-  {
-    id: "streets-night",
-    label: "Streets (Night)",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer",
-    embedUrl: "",
-    iframeSrc: "https://www.openstreetmap.org/export/embed.html?bbox=93%2C-12%2C141%2C8&layer=mapnik",
-    filter: "grayscale(100%) brightness(0.15) contrast(2.0) hue-rotate(200deg) saturate(0.3)",
-    description: "Dark street view with intelligence overlay",
-  },
-  {
-    id: "topo",
-    label: "Topographic Military",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer",
-    embedUrl: "",
-    iframeSrc: "https://www.openstreetmap.org/export/embed.html?bbox=93%2C-12%2C141%2C8&layer=mapnik",
-    filter: "grayscale(80%) brightness(0.35) contrast(1.5) sepia(0.2)",
-    description: "Topographic map with terrain data",
-  },
-  {
-    id: "foto-udara",
-    label: "Basemap Foto Udara",
-    url: "",
-    embedUrl: "https://tanahair.indonesia.go.id/portal-web",
-    iframeSrc: "https://www.openstreetmap.org/export/embed.html?bbox=104%2C-8%2C114%2C-4&layer=mapnik",
-    filter: "brightness(0.75) contrast(1.2)",
-    description: "BIG Indonesia aerial imagery",
-  },
-  {
-    id: "rbi",
-    label: "Basemap RBI",
-    url: "",
-    embedUrl: "https://tanahair.indonesia.go.id/portal-web",
-    iframeSrc: "https://www.openstreetmap.org/export/embed.html?bbox=104%2C-8%2C114%2C-4&layer=mapnik",
-    filter: "grayscale(60%) brightness(0.4) contrast(1.3)",
-    description: "Rupa Bumi Indonesia — BIG",
-  },
-  {
     id: "dark-intel",
-    label: "Dark Gray Intelligence",
-    url: "",
-    embedUrl: "",
-    iframeSrc: "https://www.openstreetmap.org/export/embed.html?bbox=93%2C-12%2C141%2C8&layer=mapnik",
+    label: "Dark Intel",
+    bbox: "93%2C-12%2C141%2C8",
     filter: "grayscale(100%) brightness(0.12) contrast(2.2) hue-rotate(190deg)",
     description: "Ultra-dark intelligence operations view",
   },
   {
+    id: "streets-night",
+    label: "Streets (Night)",
+    bbox: "104%2C-8%2C114%2C-4",
+    filter: "grayscale(100%) brightness(0.15) contrast(2.0) hue-rotate(200deg) saturate(0.3)",
+    description: "Dark street view with intelligence overlay",
+  },
+  {
+    id: "satellite",
+    label: "Satellite Imagery",
+    bbox: "93%2C-12%2C141%2C8",
+    filter: "brightness(0.7) contrast(1.3) saturate(0.8)",
+    description: "Esri World Satellite Imagery",
+  },
+  {
+    id: "topo",
+    label: "Topographic Military",
+    bbox: "93%2C-12%2C141%2C8",
+    filter: "grayscale(80%) brightness(0.35) contrast(1.5) sepia(0.2)",
+    description: "Topographic map with terrain data",
+  },
+  {
+    id: "jakarta-sector",
+    label: "Jakarta Sector",
+    bbox: "106.5%2C-6.5%2C107.2%2C-6.0",
+    filter: "grayscale(100%) brightness(0.2) contrast(1.8) sepia(0.1) hue-rotate(180deg)",
+    description: "Jakarta metropolitan area — focused view",
+  },
+  {
+    id: "natuna",
+    label: "Natuna Theater",
+    bbox: "105%2C1%2C112%2C6",
+    filter: "grayscale(100%) brightness(0.22) contrast(1.7) sepia(0.1) hue-rotate(180deg)",
+    description: "Natuna strategic zone",
+  },
+  {
     id: "realtime-data",
-    label: "Realtime Data Overlay",
-    url: "",
-    embedUrl: "",
-    iframeSrc: "https://www.openstreetmap.org/export/embed.html?bbox=104%2C-8%2C114%2C-4&layer=mapnik",
+    label: "Realtime Data",
+    bbox: "104%2C-8%2C114%2C-4",
     filter: "grayscale(100%) brightness(0.25) contrast(1.6) sepia(0.15) hue-rotate(180deg)",
     description: "Dark map with realtime coordinate data",
   },
@@ -102,24 +86,6 @@ const MapModesView = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <a
-            href="https://geoservices.big.go.id/portal/apps/webappviewer/index.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ExternalLink className="w-3 h-3" /> BIG Geoportal
-          </a>
-          <a
-            href="https://experience.arcgis.com/experience/76ae080f4cfc4c2dba1af0a3fbb804e1"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ExternalLink className="w-3 h-3" /> ArcGIS
-          </a>
-        </div>
       </div>
 
       {/* Basemap selector */}
@@ -143,7 +109,7 @@ const MapModesView = () => {
         {/* Map */}
         <div className="col-span-3 bg-card border border-border rounded overflow-hidden relative">
           <iframe
-            src={activeMap.iframeSrc}
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${activeMap.bbox}&layer=mapnik`}
             className="w-full h-full border-0"
             style={{ minHeight: "400px", filter: activeMap.filter }}
             title={activeMap.label}
@@ -159,10 +125,8 @@ const MapModesView = () => {
             <div className="text-[7px] font-mono text-muted-foreground">REALTIME TRACKING</div>
           </div>
 
-          {/* Coordinate overlay */}
           <div className="absolute bottom-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
-            <div className="text-[8px] font-mono text-muted-foreground">CENTER: -2.5°S 118.0°E</div>
-            <div className="text-[8px] font-mono text-muted-foreground">ZOOM: REGIONAL</div>
+            <div className="text-[8px] font-mono text-muted-foreground">CLASSIFICATION: RESTRICTED</div>
           </div>
         </div>
 
@@ -204,25 +168,13 @@ const MapModesView = () => {
           <div className="bg-card border border-border rounded overflow-hidden">
             <div className="px-2.5 py-1.5 border-b border-border flex items-center gap-1.5">
               <Map className="w-3 h-3 text-muted-foreground" />
-              <span className="text-[8px] font-mono text-muted-foreground tracking-wider">EXTERNAL MAPS</span>
+              <span className="text-[8px] font-mono text-muted-foreground tracking-wider">MAP INFO</span>
             </div>
-            <div className="p-2 space-y-1">
-              {[
-                { label: "Palantir Foundry Map", url: "https://www.palantir.com/docs/foundry/map/overview" },
-                { label: "ArcGIS Maritime", url: "https://experience.arcgis.com/experience/76ae080f4cfc4c2dba1af0a3fbb804e1" },
-                { label: "BIG Geoportal", url: "https://geoservices.big.go.id/portal/apps/webappviewer/index.html" },
-                { label: "MarineTraffic", url: "https://www.marinetraffic.com/en/ais/home/centerx:109.8/centery:-2.9/zoom:7" },
-              ].map((link) => (
-                <a
-                  key={link.label}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ExternalLink className="w-2.5 h-2.5" /> {link.label}
-                </a>
-              ))}
+            <div className="p-2 space-y-1 text-[8px] font-mono">
+              <div className="flex justify-between"><span className="text-muted-foreground">Source</span><span className="text-foreground">OpenStreetMap</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Projection</span><span className="text-foreground">EPSG:3857</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Updates</span><span className="text-primary">REALTIME</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Classification</span><span className="status-warning">RESTRICTED</span></div>
             </div>
           </div>
         </div>

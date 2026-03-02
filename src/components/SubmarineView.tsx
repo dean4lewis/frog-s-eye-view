@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Ship, Anchor, Navigation, Radio, ExternalLink } from "lucide-react";
+import { Ship, Anchor, Navigation, Radio } from "lucide-react";
 import DashboardPanel from "./DashboardPanel";
 
 const submarines = [
@@ -32,38 +32,39 @@ const SubmarineView = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <a
-            href="https://www.marinetraffic.com/en/ais/home/centerx:112/centery:-6/zoom:6"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ExternalLink className="w-3 h-3" /> MarineTraffic
-          </a>
-        </div>
       </div>
 
       <div className="flex-1 grid grid-cols-4 gap-2 min-h-0">
-        {/* Map with submarine positions */}
+        {/* Map with submarine area */}
         <div className="col-span-3 bg-card border border-border rounded overflow-hidden relative">
           <iframe
-            src="https://www.marinetraffic.com/en/ais/embed/centerx:112.7/centery:-4.5/zoom:5/maptype:4"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=93%2C-14%2C143%2C10&layer=mapnik"
             className="w-full h-full border-0"
-            style={{ minHeight: "400px", filter: "brightness(0.85) contrast(1.1)" }}
+            style={{ minHeight: "400px", filter: "grayscale(100%) brightness(0.15) contrast(2.0) hue-rotate(200deg) saturate(0.3)" }}
             title="Naval Fleet Map"
-            allow="fullscreen"
           />
 
           <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
             <div className="text-[9px] font-mono text-foreground font-medium">SUBMARINE TRACKING</div>
-            <div className="text-[8px] font-mono text-muted-foreground">Live Maritime Data — Indonesia EEZ</div>
+            <div className="text-[8px] font-mono text-muted-foreground">Indonesia EEZ · Classified Positions</div>
           </div>
 
           <div className="absolute top-2 right-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
             <div className="text-[8px] font-mono text-primary">{submarines.filter(s => s.status === "PATROL").length} UNITS ACTIVE</div>
             <div className="text-[7px] font-mono text-muted-foreground">CLASSIFIED POSITIONS</div>
           </div>
+
+          {/* Submarine position markers */}
+          {submarines.filter(s => s.status === "PATROL").map((sub, i) => (
+            <div
+              key={sub.name}
+              className="absolute bg-card/80 border border-primary rounded-full w-3 h-3 flex items-center justify-center cursor-pointer"
+              style={{ top: `${30 + i * 20}%`, left: `${25 + i * 15}%` }}
+              title={sub.name}
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            </div>
+          ))}
         </div>
 
         {/* Submarine List */}

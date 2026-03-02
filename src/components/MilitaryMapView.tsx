@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Map, Ship, Crosshair, Radar, ExternalLink, Layers } from "lucide-react";
+import { Map, Ship, Crosshair, Radar, Layers } from "lucide-react";
 
 const mapModes = [
-  { id: "dark", label: "Dark Intelligence", filter: "grayscale(100%) brightness(0.2) contrast(1.8) sepia(0.1) hue-rotate(180deg)" },
-  { id: "satellite", label: "Satellite Imagery", filter: "brightness(0.7) contrast(1.3) saturate(0.8)" },
-  { id: "topo", label: "Topographic", filter: "grayscale(80%) brightness(0.4) contrast(1.4)" },
-  { id: "marine", label: "Marine Traffic", filter: "none" },
+  { id: "dark", label: "Dark Intelligence", filter: "grayscale(100%) brightness(0.2) contrast(1.8) sepia(0.1) hue-rotate(180deg)", bbox: "93%2C-14%2C143%2C10" },
+  { id: "satellite", label: "Satellite View", filter: "brightness(0.7) contrast(1.3) saturate(0.8)", bbox: "93%2C-14%2C143%2C10" },
+  { id: "jakarta", label: "Jakarta Sector", filter: "grayscale(100%) brightness(0.18) contrast(2.0) hue-rotate(190deg)", bbox: "106.5%2C-6.5%2C107.2%2C-6.0" },
+  { id: "natuna", label: "Natuna Theater", filter: "grayscale(100%) brightness(0.22) contrast(1.7) sepia(0.1) hue-rotate(180deg)", bbox: "105%2C1%2C112%2C6" },
 ];
 
 const strategicPoints = [
@@ -32,13 +32,6 @@ const navalVessels = [
 const MilitaryMapView = () => {
   const [activeMode, setActiveMode] = useState(mapModes[0]);
 
-  const getMapSrc = () => {
-    if (activeMode.id === "marine") {
-      return "https://www.marinetraffic.com/en/ais/embed/centerx:112.7/centery:-4.5/zoom:5/maptype:4";
-    }
-    return "https://www.openstreetmap.org/export/embed.html?bbox=93%2C-14%2C143%2C10&layer=mapnik";
-  };
-
   return (
     <div className="h-full p-3 flex flex-col gap-2 overflow-hidden">
       <div className="flex items-center justify-between">
@@ -47,7 +40,7 @@ const MilitaryMapView = () => {
           <div>
             <h2 className="text-xs font-bold text-foreground tracking-wide">MILITARY INTELLIGENCE MAP</h2>
             <p className="text-[9px] font-mono text-muted-foreground">
-              Strategic maritime surveillance · Indonesia Exclusive Economic Zone
+              Strategic maritime surveillance · Indonesia EEZ
             </p>
           </div>
         </div>
@@ -69,17 +62,12 @@ const MilitaryMapView = () => {
       </div>
 
       <div className="flex-1 grid grid-cols-4 gap-2 min-h-0">
-        {/* Map */}
         <div className="col-span-3 bg-card border border-border rounded overflow-hidden relative">
           <iframe
-            src={getMapSrc()}
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${activeMode.bbox}&layer=mapnik`}
             className="w-full h-full border-0"
-            style={{
-              minHeight: "400px",
-              filter: activeMode.id === "marine" ? "none" : activeMode.filter,
-            }}
+            style={{ minHeight: "400px", filter: activeMode.filter }}
             title="Military Intelligence Map"
-            allow="fullscreen"
           />
 
           <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
@@ -87,31 +75,12 @@ const MilitaryMapView = () => {
             <div className="text-[8px] font-mono text-muted-foreground">Mode: {activeMode.label}</div>
           </div>
 
-          <div className="absolute bottom-2 left-2 right-2 flex gap-2 flex-wrap">
-            <a
-              href="https://experience.arcgis.com/experience/76ae080f4cfc4c2dba1af0a3fbb804e1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-card/90 border border-border rounded px-2 py-1 text-[8px] font-mono text-primary hover:bg-secondary transition-colors flex items-center gap-1"
-            >
-              <ExternalLink className="w-2.5 h-2.5" /> ArcGIS Maritime
-            </a>
-            <a
-              href="https://www.marinetraffic.com/en/ais/home/centerx:109.8/centery:-2.9/zoom:7"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-card/90 border border-border rounded px-2 py-1 text-[8px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              <Ship className="w-2.5 h-2.5" /> MarineTraffic Live
-            </a>
-            <a
-              href="https://geoservices.big.go.id/portal/apps/webappviewer/index.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-card/90 border border-border rounded px-2 py-1 text-[8px] font-mono text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              <Layers className="w-2.5 h-2.5" /> BIG Geoportal
-            </a>
+          <div className="absolute top-2 right-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
+            <div className="text-[8px] font-mono text-primary">{navalVessels.filter(v => v.status === "PATROL").length} UNITS ON PATROL</div>
+          </div>
+
+          <div className="absolute bottom-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
+            <div className="text-[8px] font-mono text-muted-foreground">CLASSIFICATION: RESTRICTED</div>
           </div>
         </div>
 
