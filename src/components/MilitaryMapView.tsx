@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Map, Ship, Crosshair, Radar, Layers } from "lucide-react";
 
 const mapModes = [
-  { id: "dark", label: "Dark Intelligence", filter: "grayscale(100%) brightness(0.2) contrast(1.8) sepia(0.1) hue-rotate(180deg)", bbox: "93%2C-14%2C143%2C10" },
-  { id: "satellite", label: "Satellite View", filter: "brightness(0.7) contrast(1.3) saturate(0.8)", bbox: "93%2C-14%2C143%2C10" },
-  { id: "jakarta", label: "Jakarta Sector", filter: "grayscale(100%) brightness(0.18) contrast(2.0) hue-rotate(190deg)", bbox: "106.5%2C-6.5%2C107.2%2C-6.0" },
-  { id: "natuna", label: "Natuna Theater", filter: "grayscale(100%) brightness(0.22) contrast(1.7) sepia(0.1) hue-rotate(180deg)", bbox: "105%2C1%2C112%2C6" },
+  { id: "dark", label: "Dark Intelligence", filter: "grayscale(100%) brightness(0.35) contrast(1.4) hue-rotate(180deg)", bbox: "93%2C-14%2C143%2C10" },
+  { id: "satellite", label: "Satellite View", filter: "brightness(0.85) contrast(1.1) saturate(0.9)", bbox: "93%2C-14%2C143%2C10" },
+  { id: "jakarta", label: "Jakarta Sector", filter: "grayscale(100%) brightness(0.35) contrast(1.4) hue-rotate(190deg)", bbox: "106.5%2C-6.5%2C107.2%2C-6.0" },
+  { id: "natuna", label: "Natuna Theater", filter: "grayscale(100%) brightness(0.35) contrast(1.4) hue-rotate(180deg)", bbox: "105%2C1%2C112%2C6" },
 ];
 
 const strategicPoints = [

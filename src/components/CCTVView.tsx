@@ -7,52 +7,33 @@ interface CCTVCamera {
   region: string;
   lat: number;
   lon: number;
-  /** YouTube video ID for live embed, or snapshot image URL */
-  streamType: "youtube" | "image";
+  streamType: "youtube" | "image" | "skyline";
   streamSrc: string;
   status: "ONLINE" | "OFFLINE";
 }
 
 const cctvCameras: CCTVCamera[] = [
-  // Jakarta & Jabodetabek - YouTube live streams
-  { id: "JKT-PORT-01", name: "Jakarta Port Container Terminal", region: "Jakarta Utara", lat: -6.1050, lon: 106.8800, streamType: "youtube", streamSrc: "t2G0Tp9BNho", status: "ONLINE" },
-  { id: "JKT-TDK-01", name: "Tol Dalam Kota - Cawang", region: "Jakarta Timur", lat: -6.2600, lon: 106.8700, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-traffic.jpg", status: "ONLINE" },
-  { id: "JKT-TLP-01", name: "Tol Layang Dalam Kota", region: "DKI Jakarta", lat: -6.2088, lon: 106.8456, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-highway-traffic-kameros.jpg", status: "ONLINE" },
-  { id: "JKT-ATP-01", name: "Tanjung Priok Access Toll", region: "Jakarta Utara", lat: -6.1200, lon: 106.8800, streamType: "image", streamSrc: "https://www.img.worldcam.pl/webcams/420x236/2026-03-02/37679.jpg", status: "ONLINE" },
-  { id: "BKS-JTK-01", name: "Bekasi - Jatikarya", region: "Bekasi", lat: -6.3700, lon: 106.9800, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/65743570623f2.jpg", status: "ONLINE" },
-  { id: "CKR-IJB-01", name: "Cikarang - Jl. Imam Bonjol", region: "Bekasi", lat: -6.2500, lon: 107.0500, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/69807584bc03f.jpg", status: "ONLINE" },
-  { id: "BGR-TRF-01", name: "Bogor - Traffic", region: "Bogor", lat: -6.5900, lon: 106.7900, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/bogor-kamery-drogowe-live.jpg", status: "ONLINE" },
-  // Additional Jabodetabek
-  { id: "JKT-SDT-01", name: "Tol Sedyatmo (Bandara)", region: "DKI Jakarta", lat: -6.1275, lon: 106.6537, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-traffic.jpg", status: "ONLINE" },
-  { id: "JKT-JRR-01", name: "JORR - Bambu Apus", region: "Jakarta Timur", lat: -6.2800, lon: 106.9200, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-highway-traffic-kameros.jpg", status: "ONLINE" },
-  { id: "TGR-JKT-01", name: "Tol Jakarta-Tangerang", region: "Tangerang", lat: -6.1800, lon: 106.6300, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-traffic.jpg", status: "ONLINE" },
-  { id: "DPK-ANT-01", name: "Depok - Antasari", region: "Depok", lat: -6.4000, lon: 106.8100, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-traffic.jpg", status: "ONLINE" },
-  { id: "JGR-JKT-01", name: "Tol Jagorawi - KM 12", region: "Jakarta-Bogor", lat: -6.3500, lon: 106.8700, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/bogor-kamery-drogowe-live.jpg", status: "ONLINE" },
-  // Luar Jabodetabek
-  { id: "CPL-PK-01", name: "Tol Cipularang", region: "Purwakarta", lat: -6.6500, lon: 107.4300, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-traffic.jpg", status: "ONLINE" },
-  { id: "CKP-PL-01", name: "Tol Cikampek-Palimanan", region: "Subang-Cirebon", lat: -6.5800, lon: 107.8600, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-traffic.jpg", status: "ONLINE" },
-  { id: "BDG-PDC-01", name: "Tol Padalarang-Cileunyi", region: "Bandung", lat: -6.9100, lon: 107.5400, streamType: "image", streamSrc: "https://www.worldcam.pl/images/webcams/420x236/jakarta-traffic.jpg", status: "ONLINE" },
+  // Jakarta - SkylineWebcams embed (verified working)
+  { id: "JKT-SKY-01", name: "Jakarta City Streets Live", region: "DKI Jakarta", lat: -6.1751, lon: 106.8130, streamType: "skyline", streamSrc: "https://www.skylinewebcams.com/en/webcam/indonesia/jakarta/jakarta/streets.html", status: "ONLINE" },
+  // Bromo / Semeru volcano cams (verified 24/7 working)
+  { id: "BROMO-01", name: "Bromo Tengger Semeru 4K Live", region: "Jawa Timur", lat: -7.9425, lon: 112.9530, streamType: "youtube", streamSrc: "-ioZYIHMB5w", status: "ONLINE" },
+  { id: "SEMERU-A", name: "Semeru Volcano Eruption 4K (CAM A)", region: "Jawa Timur", lat: -8.1077, lon: 112.9224, streamType: "youtube", streamSrc: "Zg6Zc-oWDD0", status: "ONLINE" },
+  { id: "SEMERU-B", name: "Semeru Volcano (CAM B)", region: "Jawa Timur", lat: -8.1100, lon: 112.9200, streamType: "youtube", streamSrc: "xPBtcSCu5No", status: "ONLINE" },
+  { id: "BROMO-02", name: "Bromo Penanjakan South View 4K", region: "Jawa Timur", lat: -7.9200, lon: 112.9400, streamType: "youtube", streamSrc: "4vmPmQYKzcQ", status: "ONLINE" },
+  // Bali
+  { id: "BALI-01", name: "Bali Denpasar Live Camera", region: "Bali", lat: -8.6500, lon: 115.2167, streamType: "youtube", streamSrc: "hHzx2nL_9uY", status: "ONLINE" },
+  // Demak Smart City
+  { id: "DMK-SMART", name: "CCTV Demak Smart City Live", region: "Jawa Tengah", lat: -6.8935, lon: 110.6381, streamType: "youtube", streamSrc: "0OV-Ji-buHY", status: "ONLINE" },
+  // Toll roads
+  { id: "TOL-ARUS", name: "Pantauan CCTV Tol Indonesia", region: "Nasional", lat: -6.6000, lon: 107.0000, streamType: "youtube", streamSrc: "G6Bb2GR7l0o", status: "ONLINE" },
 ];
 
 const regions = Array.from(new Set(cctvCameras.map(c => c.region)));
 
 const CCTVView = () => {
   const [selectedCam, setSelectedCam] = useState(cctvCameras[0]);
-  const [expandedRegion, setExpandedRegion] = useState<string | null>("Jakarta Utara");
-  const [viewMode, setViewMode] = useState<"map" | "live">("map");
-  const [imageKey, setImageKey] = useState(0);
-
-  const refreshImage = useCallback(() => {
-    setImageKey(k => k + 1);
-  }, []);
-
-  // Auto-refresh images every 30 seconds
-  useEffect(() => {
-    if (viewMode === "live" && selectedCam.streamType === "image") {
-      const interval = setInterval(refreshImage, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [viewMode, selectedCam, refreshImage]);
+  const [expandedRegion, setExpandedRegion] = useState<string | null>(regions[0]);
+  const [viewMode, setViewMode] = useState<"map" | "live">("live");
 
   const onlineCount = cctvCameras.filter(c => c.status === "ONLINE").length;
 
@@ -65,7 +46,7 @@ const CCTVView = () => {
           <div>
             <h2 className="text-xs font-bold text-foreground tracking-wide">CCTV SURVEILLANCE NETWORK</h2>
             <p className="text-[9px] font-mono text-muted-foreground">
-              {onlineCount}/{cctvCameras.length} cameras online · Jabodetabek & Jawa
+              {onlineCount}/{cctvCameras.length} cameras online · Indonesia Live
             </p>
           </div>
         </div>
@@ -102,16 +83,9 @@ const CCTVView = () => {
                 : `LIVE FEED — ${selectedCam.name} — ${selectedCam.region}`}
             </div>
             {viewMode === "live" && (
-              <div className="flex items-center gap-1.5">
-                {selectedCam.streamType === "image" && (
-                  <button onClick={refreshImage} className="text-muted-foreground hover:text-foreground">
-                    <RefreshCw className="w-3 h-3" />
-                  </button>
-                )}
-                <button onClick={() => setViewMode("map")} className="text-muted-foreground hover:text-foreground">
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
+              <button onClick={() => setViewMode("map")} className="text-muted-foreground hover:text-foreground">
+                <X className="w-3 h-3" />
+              </button>
             )}
           </div>
 
@@ -126,10 +100,7 @@ const CCTVView = () => {
                 />
                 <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
                   <div className="text-[9px] font-mono text-foreground font-medium">{selectedCam.name}</div>
-                  <div className="text-[8px] font-mono text-muted-foreground">{selectedCam.region}</div>
-                  <div className="text-[8px] font-mono text-muted-foreground mt-0.5">
-                    {selectedCam.lat.toFixed(4)}°S, {selectedCam.lon.toFixed(4)}°E
-                  </div>
+                  <div className="text-[8px] font-mono text-muted-foreground">{selectedCam.region} · {selectedCam.lat.toFixed(4)}°, {selectedCam.lon.toFixed(4)}°</div>
                 </div>
                 <div className="absolute bottom-2 left-2">
                   <button
@@ -144,6 +115,7 @@ const CCTVView = () => {
               <>
                 {selectedCam.streamType === "youtube" ? (
                   <iframe
+                    key={selectedCam.id}
                     src={`https://www.youtube.com/embed/${selectedCam.streamSrc}?autoplay=1&mute=1&controls=1&rel=0`}
                     className="w-full h-full border-0"
                     style={{ minHeight: "400px" }}
@@ -151,21 +123,19 @@ const CCTVView = () => {
                     allow="autoplay; encrypted-media; fullscreen"
                     allowFullScreen
                   />
+                ) : selectedCam.streamType === "skyline" ? (
+                  <iframe
+                    key={selectedCam.id}
+                    src={selectedCam.streamSrc}
+                    className="w-full h-full border-0"
+                    style={{ minHeight: "400px" }}
+                    title={`CCTV Live - ${selectedCam.name}`}
+                    allow="autoplay; encrypted-media; fullscreen"
+                    allowFullScreen
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-background relative" style={{ minHeight: "400px" }}>
-                    <img
-                      key={imageKey}
-                      src={`${selectedCam.streamSrc}?t=${imageKey}`}
-                      alt={`CCTV Feed - ${selectedCam.name}`}
-                      className="max-w-full max-h-full object-contain"
-                      style={{ filter: "brightness(0.9) contrast(1.1)" }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='236' fill='%23333'%3E%3Crect width='420' height='236' fill='%23111'/%3E%3Ctext x='210' y='118' text-anchor='middle' font-family='monospace' font-size='14' fill='%23666'%3ESIGNAL LOST%3C/text%3E%3C/svg%3E";
-                      }}
-                    />
-                    <div className="absolute bottom-3 right-3 bg-card/90 border border-border rounded px-2 py-1 text-[7px] font-mono text-muted-foreground">
-                      Auto-refresh: 30s · <button onClick={refreshImage} className="text-primary hover:text-foreground">Refresh Now</button>
-                    </div>
+                  <div className="w-full h-full flex items-center justify-center bg-background" style={{ minHeight: "400px" }}>
+                    <span className="text-muted-foreground font-mono text-xs">No feed available</span>
                   </div>
                 )}
                 <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
@@ -173,7 +143,7 @@ const CCTVView = () => {
                     <div className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
                     <span className="text-[9px] font-mono text-foreground">LIVE — {selectedCam.name}</span>
                   </div>
-                  <div className="text-[8px] font-mono text-muted-foreground">{selectedCam.region} · {selectedCam.streamType === "youtube" ? "VIDEO STREAM" : "IMAGE FEED"}</div>
+                  <div className="text-[8px] font-mono text-muted-foreground">{selectedCam.region} · YOUTUBE LIVE STREAM</div>
                 </div>
               </>
             )}
@@ -200,7 +170,7 @@ const CCTVView = () => {
                 {isExpanded && camsInRegion.map((cam) => (
                   <button
                     key={cam.id}
-                    onClick={() => setSelectedCam(cam)}
+                    onClick={() => { setSelectedCam(cam); setViewMode("live"); }}
                     className={`w-full text-left p-2 rounded border transition-all mt-0.5 ${
                       selectedCam.id === cam.id
                         ? "border-primary bg-secondary"
@@ -209,27 +179,17 @@ const CCTVView = () => {
                   >
                     <div className="flex items-center gap-1.5">
                       <div className={`w-1.5 h-1.5 rounded-full ${cam.status === "ONLINE" ? "bg-primary" : "bg-muted-foreground"}`} />
+                      <Video className="w-2 h-2 text-primary" />
                       <span className="text-[8px] font-mono font-medium text-foreground truncate">{cam.id}</span>
-                      {cam.streamType === "youtube" && <Video className="w-2 h-2 text-primary" />}
                     </div>
                     <div className="text-[7px] font-mono text-muted-foreground mt-0.5 truncate">
-                      <Camera className="w-2 h-2 inline mr-0.5" />
                       {cam.name}
                     </div>
                     <div className="flex items-center justify-between mt-0.5">
-                      <span className="text-[7px] font-mono text-muted-foreground">
-                        {cam.streamType === "youtube" ? "VIDEO" : "IMAGE"}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedCam(cam);
-                          setViewMode("live");
-                        }}
-                        className="text-[7px] font-mono text-primary hover:text-foreground flex items-center gap-0.5"
-                      >
+                      <span className="text-[7px] font-mono text-primary">LIVE VIDEO</span>
+                      <span className="text-[7px] font-mono text-primary flex items-center gap-0.5">
                         <Play className="w-2 h-2" /> View
-                      </button>
+                      </span>
                     </div>
                   </button>
                 ))}

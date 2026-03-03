@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Radio, Send, Shield, Lock, Users, Trash2 } from "lucide-react";
+import { Radio, Send, Shield, Lock, Users, Trash2, Eye, EyeOff } from "lucide-react";
 
 interface Message {
   id: string;
@@ -7,6 +7,8 @@ interface Message {
   text: string;
   time: string;
   isOwn: boolean;
+  readAt?: number; // timestamp when read
+  blurred?: boolean;
 }
 
 const onlineAgents = [
@@ -18,6 +20,8 @@ const onlineAgents = [
   { id: "A-09", name: "COBRA-09", division: "Analysis", status: "ONLINE" },
 ];
 
+const BLUR_DELAY_MS = 5 * 60 * 1000; // 5 minutes
+
 const CommsView = () => {
   const [selectedAgent, setSelectedAgent] = useState(onlineAgents[0]);
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
@@ -25,6 +29,7 @@ const CommsView = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [deleteCountdown, setDeleteCountdown] = useState("23:59:47");
 
+  // Auto-purge countdown
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -38,6 +43,41 @@ const CommsView = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-blur messages after 5 minutes of being read
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setMessages((prev) => {
+        let changed = false;
+        const updated: Record<string, Message[]> = {};
+        for (const [agentId, msgs] of Object.entries(prev)) {
+          updated[agentId] = msgs.map((msg) => {
+            if (msg.readAt && !msg.blurred && now - msg.readAt >= BLUR_DELAY_MS) {
+              changed = true;
+              return { ...msg, blurred: true };
+            }
+            return msg;
+          });
+        }
+        return changed ? updated : prev;
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Mark messages as read when viewing
+  useEffect(() => {
+    setMessages((prev) => {
+      const agentMsgs = prev[selectedAgent.id];
+      if (!agentMsgs) return prev;
+      const now = Date.now();
+      const updated = agentMsgs.map((msg) =>
+        !msg.readAt ? { ...msg, readAt: now } : msg
+      );
+      return { ...prev, [selectedAgent.id]: updated };
+    });
+  }, [selectedAgent.id, messages[selectedAgent.id]?.length]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
@@ -53,6 +93,7 @@ const CommsView = () => {
       text: input.trim(),
       time: timeStr,
       isOwn: true,
+      readAt: Date.now(),
     };
 
     setMessages((prev) => ({
@@ -87,15 +128,17 @@ const CommsView = () => {
           <div>
             <h2 className="text-xs font-bold text-foreground tracking-wide">SECURE COMMUNICATIONS</h2>
             <p className="text-[9px] font-mono text-muted-foreground">
-              E2E Encrypted · Auto-purge in {deleteCountdown}
+              E2E Encrypted · Auto-purge in {deleteCountdown} · Messages blur after 5min
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2 text-[8px] font-mono">
           <Lock className="w-3 h-3 text-primary" />
           <span className="text-primary">AES-256</span>
+          <EyeOff className="w-3 h-3 text-muted-foreground" />
+          <span className="text-muted-foreground">5min AUTO-BLUR</span>
           <Trash2 className="w-3 h-3 text-muted-foreground" />
-          <span className="text-muted-foreground">24h AUTO-DELETE</span>
+          <span className="text-muted-foreground">24h DELETE</span>
         </div>
       </div>
 
@@ -163,20 +206,31 @@ const CommsView = () => {
                   <Lock className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
                   <p className="text-[9px] font-mono text-muted-foreground">Secure channel established</p>
                   <p className="text-[8px] font-mono text-muted-foreground mt-1">Messages are encrypted end-to-end</p>
-                  <p className="text-[8px] font-mono text-muted-foreground">Auto-delete in {deleteCountdown}</p>
+                  <p className="text-[8px] font-mono text-muted-foreground">Auto-blur after 5 min · Auto-delete in {deleteCountdown}</p>
                 </div>
               </div>
             )}
             {agentMessages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[70%] rounded px-3 py-1.5 ${
+                <div className={`max-w-[70%] rounded px-3 py-1.5 relative ${
                   msg.isOwn
                     ? "bg-secondary border border-border"
                     : "bg-muted border border-border"
-                }`}>
+                } ${msg.blurred ? "select-none" : ""}`}>
+                  {msg.blurred && (
+                    <div className="absolute inset-0 backdrop-blur-md bg-card/50 rounded flex items-center justify-center z-10">
+                      <div className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground">
+                        <EyeOff className="w-3 h-3" />
+                        <span>MESSAGE EXPIRED</span>
+                      </div>
+                    </div>
+                  )}
                   <div className="text-[8px] font-mono text-primary mb-0.5">{msg.sender}</div>
                   <div className="text-[10px] font-mono text-foreground">{msg.text}</div>
-                  <div className="text-[7px] font-mono text-muted-foreground text-right mt-0.5">{msg.time}</div>
+                  <div className="text-[7px] font-mono text-muted-foreground text-right mt-0.5 flex items-center justify-end gap-1">
+                    {msg.time}
+                    {msg.readAt && !msg.blurred && <Eye className="w-2 h-2 text-primary" />}
+                  </div>
                 </div>
               </div>
             ))}

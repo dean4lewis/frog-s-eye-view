@@ -1,24 +1,40 @@
 import { useState } from "react";
-import { Ship, Anchor, Navigation, Radio } from "lucide-react";
+import { Ship, Anchor, Navigation, Radio, Waves, MapPin } from "lucide-react";
 import DashboardPanel from "./DashboardPanel";
 
 const submarines = [
-  { name: "KRI Nagapasa-403", class: "Chang Bogo (Type 209/1400)", status: "PATROL", area: "Laut Natuna", depth: "150m", crew: 40, year: 2017 },
-  { name: "KRI Ardadedali-404", class: "Chang Bogo (Type 209/1400)", status: "PATROL", area: "Selat Malaka", depth: "120m", crew: 40, year: 2018 },
-  { name: "KRI Alugoro-405", class: "Chang Bogo (Type 209/1400)", status: "DOCK", area: "Surabaya", depth: "—", crew: 40, year: 2021 },
-  { name: "KRI Cakra-401", class: "Type 209/1300", status: "PATROL", area: "Selat Sunda", depth: "80m", crew: 34, year: 1981 },
-  { name: "KRI Nanggala-402", class: "Type 209/1300", status: "DECOMMISSIONED", area: "—", depth: "—", crew: 0, year: 1981 },
+  { name: "KRI Nagapasa-403", class: "Chang Bogo (Type 209/1400)", status: "PATROL", area: "Laut Natuna", depth: "150m", crew: 40, year: 2017, lat: 4.0, lon: 108.0 },
+  { name: "KRI Ardadedali-404", class: "Chang Bogo (Type 209/1400)", status: "PATROL", area: "Selat Malaka", depth: "120m", crew: 40, year: 2018, lat: 2.5, lon: 101.0 },
+  { name: "KRI Alugoro-405", class: "Chang Bogo (Type 209/1400)", status: "DOCK", area: "Surabaya", depth: "—", crew: 40, year: 2021, lat: -7.25, lon: 112.75 },
+  { name: "KRI Cakra-401", class: "Type 209/1300", status: "PATROL", area: "Selat Sunda", depth: "80m", crew: 34, year: 1981, lat: -6.1, lon: 105.7 },
+  { name: "KRI Nanggala-402", class: "Type 209/1300", status: "DECOMMISSIONED", area: "—", depth: "—", crew: 0, year: 1981, lat: 0, lon: 0 },
 ];
 
 const navalBases = [
-  { name: "Pangkalan Utama TNI AL II", location: "Surabaya", lat: -7.2, lon: 112.75, type: "Markas Armada Timur" },
-  { name: "Pangkalan Utama TNI AL III", location: "Jakarta", lat: -6.1, lon: 106.85, type: "Markas Armada Barat" },
-  { name: "Pangkalan Utama TNI AL IV", location: "Tanjung Pinang", lat: 0.92, lon: 104.45, type: "Pangkalan Kapal Selam" },
-  { name: "Pangkalan Utama TNI AL V", location: "Makassar", lat: -5.14, lon: 119.42, type: "Markas Armada Tengah" },
+  { name: "Lantamal II", location: "Surabaya", lat: -7.2, lon: 112.75, type: "Markas Armada Timur" },
+  { name: "Lantamal III", location: "Jakarta", lat: -6.1, lon: 106.85, type: "Markas Armada Barat" },
+  { name: "Lantamal IV", location: "Tanjung Pinang", lat: 0.92, lon: 104.45, type: "Pangkalan Kapal Selam" },
+  { name: "Lantamal V", location: "Makassar", lat: -5.14, lon: 119.42, type: "Markas Armada Tengah" },
 ];
+
+type MapSource = "maritime" | "kkp" | "vtc";
 
 const SubmarineView = () => {
   const [selectedSub, setSelectedSub] = useState(submarines[0]);
+  const [mapSource, setMapSource] = useState<MapSource>("maritime");
+
+  const getMapSrc = () => {
+    switch (mapSource) {
+      case "maritime":
+        return "https://www.marinetraffic.com/en/ais/embed/centerx:109.8/centery:-2.9/zoom:5/maptype:4/shownames:false/mmsi:0/shipid:0/port:0/showmenu:false/showsearch:false";
+      case "kkp":
+        return "https://sidako.kkp.go.id/sidako/map";
+      case "vtc":
+        return "https://vtc.kkp.go.id/#7/-2.9/109.8";
+      default:
+        return "https://www.marinetraffic.com/en/ais/embed/centerx:109.8/centery:-2.9/zoom:5/maptype:4/shownames:false/mmsi:0/shipid:0/port:0/showmenu:false/showsearch:false";
+    }
+  };
 
   return (
     <div className="h-full p-3 flex flex-col gap-2 overflow-hidden">
@@ -28,43 +44,59 @@ const SubmarineView = () => {
           <div>
             <h2 className="text-xs font-bold text-foreground tracking-wide">SUBMARINE FLEET COMMAND</h2>
             <p className="text-[9px] font-mono text-muted-foreground">
-              {submarines.filter(s => s.status === "PATROL").length} units on patrol · TNI AL Fleet
+              {submarines.filter(s => s.status === "PATROL").length} units on patrol · TNI AL Fleet · Realtime Maritime Data
             </p>
           </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {([
+            { id: "maritime" as MapSource, label: "MarineTraffic" },
+            { id: "kkp" as MapSource, label: "KKP SIDAKO" },
+            { id: "vtc" as MapSource, label: "KKP VTC" },
+          ]).map((src) => (
+            <button
+              key={src.id}
+              onClick={() => setMapSource(src.id)}
+              className={`px-2 py-0.5 text-[8px] font-mono rounded border transition-colors ${
+                mapSource === src.id
+                  ? "border-primary bg-secondary text-foreground"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {src.label}
+            </button>
+          ))}
         </div>
       </div>
 
       <div className="flex-1 grid grid-cols-4 gap-2 min-h-0">
-        {/* Map with submarine area */}
+        {/* Map with maritime data */}
         <div className="col-span-3 bg-card border border-border rounded overflow-hidden relative">
           <iframe
-            src="https://www.openstreetmap.org/export/embed.html?bbox=93%2C-14%2C143%2C10&layer=mapnik"
+            key={mapSource}
+            src={getMapSrc()}
             className="w-full h-full border-0"
-            style={{ minHeight: "400px", filter: "grayscale(100%) brightness(0.15) contrast(2.0) hue-rotate(200deg) saturate(0.3)" }}
-            title="Naval Fleet Map"
+            style={{ minHeight: "400px" }}
+            title="Maritime Fleet Map"
+            sandbox="allow-scripts allow-same-origin allow-popups"
           />
 
           <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
-            <div className="text-[9px] font-mono text-foreground font-medium">SUBMARINE TRACKING</div>
-            <div className="text-[8px] font-mono text-muted-foreground">Indonesia EEZ · Classified Positions</div>
+            <div className="text-[9px] font-mono text-foreground font-medium flex items-center gap-1.5">
+              <Waves className="w-3 h-3 text-primary" />
+              MARITIME TRACKING — {mapSource === "maritime" ? "AIS Data" : mapSource === "kkp" ? "SIDAKO KKP" : "VTC KKP"}
+            </div>
+            <div className="text-[8px] font-mono text-muted-foreground">Indonesia EEZ · Realtime Vessel Positions</div>
           </div>
 
           <div className="absolute top-2 right-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
-            <div className="text-[8px] font-mono text-primary">{submarines.filter(s => s.status === "PATROL").length} UNITS ACTIVE</div>
+            <div className="text-[8px] font-mono text-primary">{submarines.filter(s => s.status === "PATROL").length} SUBS ON PATROL</div>
             <div className="text-[7px] font-mono text-muted-foreground">CLASSIFIED POSITIONS</div>
           </div>
 
-          {/* Submarine position markers */}
-          {submarines.filter(s => s.status === "PATROL").map((sub, i) => (
-            <div
-              key={sub.name}
-              className="absolute bg-card/80 border border-primary rounded-full w-3 h-3 flex items-center justify-center cursor-pointer"
-              style={{ top: `${30 + i * 20}%`, left: `${25 + i * 15}%` }}
-              title={sub.name}
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            </div>
-          ))}
+          <div className="absolute bottom-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
+            <div className="text-[8px] font-mono text-muted-foreground">Click vessels on map for details</div>
+          </div>
         </div>
 
         {/* Submarine List */}
@@ -104,15 +136,21 @@ const SubmarineView = () => {
               <div className="flex justify-between"><span className="text-muted-foreground">Depth</span><span className="text-foreground">{selectedSub.depth}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Crew</span><span className="text-foreground">{selectedSub.crew}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Comm.</span><span className="text-foreground">{selectedSub.year}</span></div>
+              {selectedSub.lat !== 0 && (
+                <div className="flex justify-between"><span className="text-muted-foreground">Position</span><span className="text-primary">{selectedSub.lat.toFixed(2)}° {selectedSub.lon.toFixed(2)}°</span></div>
+              )}
             </div>
           </DashboardPanel>
 
           <DashboardPanel title="Naval Bases" icon={<Radio className="w-3 h-3" />}>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {navalBases.map((base) => (
                 <div key={base.name} className="text-[7px] font-mono">
-                  <div className="text-foreground">{base.location}</div>
-                  <div className="text-muted-foreground">{base.type}</div>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-2 h-2 text-primary" />
+                    <span className="text-foreground">{base.location}</span>
+                  </div>
+                  <div className="text-muted-foreground ml-3">{base.type}</div>
                 </div>
               ))}
             </div>

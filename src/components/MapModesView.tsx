@@ -5,57 +5,51 @@ const basemaps = [
   {
     id: "dark-gray",
     label: "Dark Gray Canvas",
-    bbox: "93%2C-12%2C141%2C8",
-    filter: "grayscale(100%) brightness(0.2) contrast(1.8) sepia(0.1) hue-rotate(180deg)",
+    tileUrl: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
     description: "Dark Gray Military Intelligence",
   },
   {
     id: "dark-intel",
     label: "Dark Intel",
-    bbox: "93%2C-12%2C141%2C8",
-    filter: "grayscale(100%) brightness(0.12) contrast(2.2) hue-rotate(190deg)",
+    tileUrl: "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png",
     description: "Ultra-dark intelligence operations view",
   },
   {
     id: "streets-night",
     label: "Streets (Night)",
-    bbox: "104%2C-8%2C114%2C-4",
-    filter: "grayscale(100%) brightness(0.15) contrast(2.0) hue-rotate(200deg) saturate(0.3)",
-    description: "Dark street view with intelligence overlay",
+    tileUrl: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    description: "Dark street navigation with labels",
   },
   {
     id: "satellite",
     label: "Satellite Imagery",
-    bbox: "93%2C-12%2C141%2C8",
-    filter: "brightness(0.7) contrast(1.3) saturate(0.8)",
+    tileUrl: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     description: "Esri World Satellite Imagery",
   },
   {
     id: "topo",
     label: "Topographic Military",
-    bbox: "93%2C-12%2C141%2C8",
-    filter: "grayscale(80%) brightness(0.35) contrast(1.5) sepia(0.2)",
+    tileUrl: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
     description: "Topographic map with terrain data",
   },
   {
     id: "jakarta-sector",
     label: "Jakarta Sector",
-    bbox: "106.5%2C-6.5%2C107.2%2C-6.0",
-    filter: "grayscale(100%) brightness(0.2) contrast(1.8) sepia(0.1) hue-rotate(180deg)",
+    tileUrl: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
     description: "Jakarta metropolitan area — focused view",
+    center: { lat: -6.2088, lon: 106.8456, zoom: 12 },
   },
   {
     id: "natuna",
     label: "Natuna Theater",
-    bbox: "105%2C1%2C112%2C6",
-    filter: "grayscale(100%) brightness(0.22) contrast(1.7) sepia(0.1) hue-rotate(180deg)",
+    tileUrl: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
     description: "Natuna strategic zone",
+    center: { lat: 3.99, lon: 108.38, zoom: 7 },
   },
   {
     id: "realtime-data",
     label: "Realtime Data",
-    bbox: "104%2C-8%2C114%2C-4",
-    filter: "grayscale(100%) brightness(0.25) contrast(1.6) sepia(0.15) hue-rotate(180deg)",
+    tileUrl: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
     description: "Dark map with realtime coordinate data",
   },
 ];
@@ -73,6 +67,31 @@ const realtimePoints = [
 
 const MapModesView = () => {
   const [activeMap, setActiveMap] = useState(basemaps[0]);
+
+  // Build iframe URL based on map type
+  const getMapUrl = () => {
+    const bm = activeMap;
+    if (bm.id === "satellite") {
+      // Use ArcGIS satellite embed
+      return "https://www.arcgis.com/apps/mapviewer/index.html?webmap=c03a526d94704bfb839445e80de95495";
+    }
+    // For CartoDB/OSM based maps, use OSM embed with appropriate filter
+    const center = (bm as any).center;
+    if (center) {
+      const delta = 0.5;
+      return `https://www.openstreetmap.org/export/embed.html?bbox=${center.lon - delta}%2C${center.lat - delta}%2C${center.lon + delta}%2C${center.lat + delta}&layer=mapnik`;
+    }
+    return `https://www.openstreetmap.org/export/embed.html?bbox=93%2C-12%2C141%2C8&layer=mapnik`;
+  };
+
+  const getFilter = () => {
+    if (activeMap.id === "satellite") return "brightness(0.85) contrast(1.1) saturate(0.9)";
+    if (activeMap.id === "topo") return "grayscale(60%) brightness(0.45) contrast(1.3) sepia(0.15)";
+    if (activeMap.id === "dark-intel") return "grayscale(100%) brightness(0.3) contrast(1.5) hue-rotate(180deg)";
+    if (activeMap.id === "streets-night") return "grayscale(100%) brightness(0.35) contrast(1.4) hue-rotate(190deg) saturate(0.4)";
+    // Default dark gray - not too dark
+    return "grayscale(100%) brightness(0.3) contrast(1.5) hue-rotate(180deg)";
+  };
 
   return (
     <div className="h-full p-3 flex flex-col gap-2 overflow-hidden">
@@ -109,10 +128,12 @@ const MapModesView = () => {
         {/* Map */}
         <div className="col-span-3 bg-card border border-border rounded overflow-hidden relative">
           <iframe
-            src={`https://www.openstreetmap.org/export/embed.html?bbox=${activeMap.bbox}&layer=mapnik`}
+            key={activeMap.id}
+            src={getMapUrl()}
             className="w-full h-full border-0"
-            style={{ minHeight: "400px", filter: activeMap.filter }}
+            style={{ minHeight: "400px", filter: getFilter() }}
             title={activeMap.label}
+            sandbox="allow-scripts allow-same-origin"
           />
 
           <div className="absolute top-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
@@ -124,6 +145,24 @@ const MapModesView = () => {
             <div className="text-[8px] font-mono text-primary">{realtimePoints.length} ACTIVE NODES</div>
             <div className="text-[7px] font-mono text-muted-foreground">REALTIME TRACKING</div>
           </div>
+
+          {/* Overlay markers for realtime points */}
+          {realtimePoints.map((pt, i) => (
+            <div
+              key={pt.name}
+              className="absolute group cursor-pointer"
+              style={{
+                top: `${15 + (i % 4) * 20}%`,
+                left: `${10 + (i % 5) * 18}%`,
+              }}
+            >
+              <div className="w-2.5 h-2.5 rounded-full bg-primary/80 border border-primary animate-pulse" />
+              <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-card border border-border rounded px-2 py-1 whitespace-nowrap z-10">
+                <div className="text-[8px] font-mono text-foreground">{pt.name}</div>
+                <div className="text-[7px] font-mono text-primary">{pt.type}</div>
+              </div>
+            </div>
+          ))}
 
           <div className="absolute bottom-2 left-2 bg-card/90 border border-border rounded px-2.5 py-1.5 backdrop-blur-sm">
             <div className="text-[8px] font-mono text-muted-foreground">CLASSIFICATION: RESTRICTED</div>
@@ -171,7 +210,7 @@ const MapModesView = () => {
               <span className="text-[8px] font-mono text-muted-foreground tracking-wider">MAP INFO</span>
             </div>
             <div className="p-2 space-y-1 text-[8px] font-mono">
-              <div className="flex justify-between"><span className="text-muted-foreground">Source</span><span className="text-foreground">OpenStreetMap</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Source</span><span className="text-foreground">CartoDB / OSM</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Projection</span><span className="text-foreground">EPSG:3857</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Updates</span><span className="text-primary">REALTIME</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Classification</span><span className="status-warning">RESTRICTED</span></div>
