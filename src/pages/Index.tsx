@@ -4,7 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import DashboardView from "@/components/DashboardView";
 import SatelliteView from "@/components/SatelliteView";
-import CCTVView from "@/components/CCTVView";
+import CCTVViewNew from "@/components/CCTVViewNew";
 import TargetView from "@/components/TargetView";
 import TerminalOverlay from "@/components/TerminalOverlay";
 import ScanEffect from "@/components/ScanEffect";
@@ -59,7 +59,7 @@ const Index = () => {
       case "satellites":
         return <SatelliteView />;
       case "cctv":
-        return <CCTVView />;
+        return <CCTVViewNew />;
       case "mapping":
         return <MilitaryMapView />;
       case "targets":
