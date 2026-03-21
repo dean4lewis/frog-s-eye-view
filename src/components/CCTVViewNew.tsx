@@ -24,6 +24,7 @@ const CCTVViewNew = () => {
   const [selectedCamera, setSelectedCamera] = useState<CCTVCamera | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedProvince, setExpandedProvince] = useState<string | null>(null);
+  const [expandedCities, setExpandedCities] = useState<Set<string>>(new Set());
   const [gridMode, setGridMode] = useState(false);
   const [gridCameras, setGridCameras] = useState<CCTVCamera[]>([]);
   const [loading, setLoading] = useState(true);
@@ -182,6 +183,19 @@ const CCTVViewNew = () => {
   const filteredProvinces = provinces.filter(p =>
     filteredCameras.some(c => c.province === p)
   );
+
+  const getCitiesInProvince = (province: string) => {
+    const cities = Array.from(new Set(
+      filteredCameras
+        .filter(c => c.province === province)
+        .map(c => c.city)
+    )).sort();
+    return cities;
+  };
+
+  const getCamerasInCity = (province: string, city: string) => {
+    return filteredCameras.filter(c => c.province === province && c.city === city);
+  };
 
   const handleCameraSelect = (camera: CCTVCamera) => {
     setSelectedCamera(camera);
@@ -350,6 +364,7 @@ const CCTVViewNew = () => {
           <div className="flex-1 overflow-y-auto flex flex-col gap-0.5">
             {filteredProvinces.map((province) => {
               const camsInProvince = filteredCameras.filter(c => c.province === province);
+              const citiesInProvince = getCitiesInProvince(province);
               const isExpanded = expandedProvince === province;
               return (
                 <div key={province}>
@@ -357,29 +372,53 @@ const CCTVViewNew = () => {
                     onClick={() => setExpandedProvince(isExpanded ? null : province)}
                     className="w-full text-left px-2 py-1 text-[8px] font-mono text-muted-foreground hover:text-foreground flex items-center justify-between bg-secondary/50 rounded"
                   >
-                    <span>{province} ({camsInProvince.length})</span>
+                    <span className="font-bold">{province} ({camsInProvince.length})</span>
                     <ChevronDown className={`w-2.5 h-2.5 transition-transform ${isExpanded ? "rotate-0" : "-rotate-90"}`} />
                   </button>
-                  {isExpanded && camsInProvince.map((cam) => (
-                    <button
-                      key={cam.id}
-                      onClick={() => handleCameraSelect(cam)}
-                      className={`w-full text-left p-1.5 rounded border transition-all mt-0.5 ${
-                        selectedCamera?.id === cam.id
-                          ? "border-primary bg-secondary"
-                          : "border-border bg-card hover:bg-muted"
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        <Radio className="w-2 h-2 text-primary" />
-                        <span className="text-[7px] font-mono font-medium text-foreground truncate">{cam.camera_name}</span>
+                  {isExpanded && citiesInProvince.map((city) => {
+                    const camsInCity = getCamerasInCity(province, city);
+                    const cityKey = `${province}__${city}`;
+                    const isCityExpanded = expandedCities.has(cityKey);
+                    return (
+                      <div key={city} className="pl-2">
+                        <button
+                          onClick={() => {
+                            const newSet = new Set(expandedCities);
+                            if (newSet.has(cityKey)) {
+                              newSet.delete(cityKey);
+                            } else {
+                              newSet.add(cityKey);
+                            }
+                            setExpandedCities(newSet);
+                          }}
+                          className="w-full text-left px-2 py-0.5 mt-0.5 text-[7px] font-mono text-muted-foreground hover:text-foreground flex items-center justify-between bg-card/50 rounded border border-border/30"
+                        >
+                          <span>{city} ({camsInCity.length})</span>
+                          <ChevronDown className={`w-2 h-2 transition-transform ${isCityExpanded ? "rotate-0" : "-rotate-90"}`} />
+                        </button>
+                        {isCityExpanded && camsInCity.map((cam) => (
+                          <button
+                            key={cam.id}
+                            onClick={() => handleCameraSelect(cam)}
+                            className={`w-full text-left p-1.5 rounded border transition-all mt-0.5 pl-4 ${
+                              selectedCamera?.id === cam.id
+                                ? "border-primary bg-secondary"
+                                : "border-border bg-card hover:bg-muted"
+                            }`}
+                          >
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                              <Radio className="w-2 h-2 text-primary" />
+                              <span className="text-[7px] font-mono font-medium text-foreground truncate">{cam.camera_name}</span>
+                            </div>
+                            <div className="text-[6px] font-mono text-muted-foreground mt-0.5 truncate">
+                              {cam.location_detail}
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                      <div className="text-[6px] font-mono text-muted-foreground mt-0.5 truncate">
-                        {cam.location_detail || cam.city}
-                      </div>
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               );
             })}
