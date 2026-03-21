@@ -69,6 +69,12 @@ const CCTVViewNew = () => {
   useEffect(() => {
     if (!selectedCamera || gridMode) return;
 
+    const validCamera = cameras.find(c => c.id === selectedCamera.id);
+    if (!validCamera) {
+      setSelectedCamera(null);
+      return;
+    }
+
     const video = videoRef.current;
     if (!video) return;
 
@@ -87,7 +93,7 @@ const CCTVViewNew = () => {
 
       hlsRef.current = hls;
 
-      hls.loadSource(selectedCamera.stream_url);
+      hls.loadSource(validCamera.stream_url);
       hls.attachMedia(video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -107,14 +113,14 @@ const CCTVViewNew = () => {
         hls.destroy();
       };
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = selectedCamera.stream_url;
+      video.src = validCamera.stream_url;
       video.addEventListener('loadedmetadata', () => {
         video.play().catch(err => {
           console.log('Autoplay prevented:', err);
         });
       });
     }
-  }, [selectedCamera, gridMode]);
+  }, [selectedCamera, gridMode, cameras]);
 
   useEffect(() => {
     if (!gridMode) {
@@ -127,7 +133,11 @@ const CCTVViewNew = () => {
 
     const videoElements = [videoRef1.current, videoRef2.current, videoRef3.current, videoRef.current];
 
-    gridCameras.forEach((camera, index) => {
+    const validGridCameras = gridCameras
+      .map(cam => cameras.find(c => c.id === cam.id))
+      .filter((cam): cam is CCTVCamera => !!cam);
+
+    validGridCameras.forEach((camera, index) => {
       const video = videoElements[index];
       if (!video || !camera) return;
 
@@ -169,7 +179,7 @@ const CCTVViewNew = () => {
       });
       hlsRefs.current = [null, null, null, null];
     };
-  }, [gridMode, gridCameras]);
+  }, [gridMode, gridCameras, cameras]);
 
   const filteredCameras = searchQuery
     ? cameras.filter(c =>
@@ -198,11 +208,14 @@ const CCTVViewNew = () => {
   };
 
   const handleCameraSelect = (camera: CCTVCamera) => {
-    setSelectedCamera(camera);
-    if (gridMode) {
-      const idx = gridCameras.findIndex(g => g.id === camera.id);
-      if (idx === -1) {
-        setGridCameras(prev => [camera, ...prev.slice(0, 3)]);
+    const validCamera = cameras.find(c => c.id === camera.id);
+    if (validCamera) {
+      setSelectedCamera(validCamera);
+      if (gridMode) {
+        const idx = gridCameras.findIndex(g => g.id === camera.id);
+        if (idx === -1) {
+          setGridCameras(prev => [validCamera, ...prev.slice(0, 3)]);
+        }
       }
     }
   };
